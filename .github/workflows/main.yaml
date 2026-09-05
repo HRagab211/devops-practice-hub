@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: dep_install
     steps:
+      - name: print current dir
+        run: ls -al
       - name: Copy .env
         run: cp .env.example .env
 
