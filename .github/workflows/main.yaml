@@ -4,7 +4,7 @@ on:
     branches:
       - plain-workflows
 jobs:
-  prerequestion:
+  dep_install:
     name: install laravel depenedancies and checkout
     runs-on: ubuntu-latest
     steps:
@@ -12,4 +12,34 @@ jobs:
         uses: actions/checkout@v7
 
       - name: print current dir
-        run : ls -al 
+        run : ls -al
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3' # Match your Laravel PHP version
+          extensions: mbstring, dom, fileinfo, curl, xml, bcmath
+          tools: composer:v2
+
+        # 2. Cache Composer Dependencies (Speeds up workflow)
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache PHP Dependencies
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: install npm dependancies
+        run: npm ci
+
+      - name: build assets
+        run: npm run build
+
+    
