@@ -11,7 +11,8 @@
             <x-card>
                 <p class="text-sm text-slate-500">{{ $label }}</p>
                 <p class="mt-4 text-4xl font-semibold tabular-nums {{ $key === 'completed' ? 'text-brand' : '' }}">
-                    {{ $counts[$key] }}</p>
+                    {{ $counts[$key] }}
+                </p>
             </x-card>
         @endforeach
     </div>
@@ -22,7 +23,7 @@
                 <x-button :href="route('tasks.create')">New task</x-button>
             </div>
             <x-task-list :tasks="$tasks" />
-            <a class="text-sm font-medium text-brand" href="{{ route('tasks.index') }}">View all tasks →</a>
+            <a class="text-brand text-sm font-medium" href="{{ route('tasks.index') }}">View all tasks →</a>
         </x-card>
         <x-card>
             <h2 class="text-lg font-semibold">Your latest report</h2>
@@ -30,10 +31,11 @@
                 <p class="my-4 text-sm text-slate-500">Requested {{ $report->created_at->format('M j, Y · H:i') }}</p>
                 <x-status-badge :status="$report->status" />
             @else
-                <p class="mt-4 text-sm leading-relaxed text-slate-500">No reports yet. Create a CSV of your tasks
-                    whenever you need a copy.</p>
+                <p class="mt-4 text-sm leading-relaxed text-slate-500">
+                    No reports yet. Create a CSV of your tasks whenever you need a copy.
+                </p>
             @endif
-            <a class="mt-6 block text-sm font-medium text-brand" href="{{ route('reports.index') }}">Open reports →</a>
+            <a class="text-brand mt-6 block text-sm font-medium" href="{{ route('reports.index') }}">Open reports →</a>
         </x-card>
     </div>
 </x-layout>
