@@ -53,7 +53,7 @@ jobs:
       - name: run pint
         run: ./vendor/bin/pint --test
 
-      - name: run all tests
-        run: ./vendor/bin/phpstan analyse
+      - name: run code checks
+        run: ./vendor/bin/phpstan analyse */*.php
       - name: run all tests
         run: php artisan test --compact
