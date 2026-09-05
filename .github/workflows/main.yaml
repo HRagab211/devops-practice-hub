@@ -1,0 +1,15 @@
+name: Deploy laravel application as monolithc application
+on:
+  push:
+    branches:
+      - plain-workflows
+jobs:
+  prerequestion:
+    name: install laravel depenedancies and checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the project
+        uses: actions/checkout@v7
+
+      - name: print current dir
+        run : ls -al 
