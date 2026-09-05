@@ -50,5 +50,10 @@ jobs:
       - name: run database migration
         run : php artisan migrate --force
 
+      - name: run pint
+        run: ./vendor/bin/pint --test
+
+      - name: run all tests
+        run: ./vendor/bin/phpstan analyse
       - name: run all tests
         run: php artisan test --compact
