@@ -1,0 +1,12 @@
+@import 'tailwindcss';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../views/**/*.blade.php';
+@theme {
+--font-sans: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
+--color-brand: #2458db;
+}
+@layer base {
+body { @apply bg-slate-50 text-slate-800 antialiased; }
+a, button, input, textarea, select { @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand; }
+button { @apply cursor-pointer; }
+}
