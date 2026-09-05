@@ -16,7 +16,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3' # Match your Laravel PHP version
+          php-version: '8.5' # Match your Laravel PHP version
           extensions: mbstring, dom, fileinfo, curl, xml, bcmath
           tools: composer:v2
 
@@ -42,4 +42,3 @@ jobs:
       - name: build assets
         run: npm run build
 
-    
