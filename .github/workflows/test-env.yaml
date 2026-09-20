@@ -1,0 +1,64 @@
+name: Deploy laravel application as monolithc application
+on:
+  workflow_call:
+      inputs:
+        php_version:
+          required: false
+          type: string
+          default: "8.5"
+    # branches:
+    #   - plain-workflows
+jobs:
+  dep_install:
+    name: install laravel depenedancies and checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the project
+        uses: actions/checkout@v7
+
+      - name: print current dir
+        run: ls -al
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{inputs.php_version}} # Match your Laravel PHP version
+          extensions: mbstring, dom, fileinfo, curl, xml, bcmath
+          tools: composer:v2
+
+        # 2. Cache Composer Dependencies (Speeds up workflow)
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache PHP Dependencies
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: install npm dependancies
+        run: npm ci
+
+      - name: build assets
+        run: npm run build
+      - name: Copy .env
+        run: cp .env.example .env
+
+      - name: generate application key
+        run : php artisan key:generate
+
+      - name: run database migration
+        run : php artisan migrate --force
+
+      - name: run pint
+        run: ./vendor/bin/pint --test
+
+      - name: run code checks
+        run: ./vendor/bin/phpstan analyse */*.php
+      - name: run all tests
+        run: php artisan test --compact
