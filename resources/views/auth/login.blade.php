@@ -2,7 +2,7 @@
     <div class="mx-auto max-w-md py-6">
         <x-page-heading title="Welcome back" description="Pick up where you left off." />
         <x-card>
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+            <form method="POST" action="{{ route('login') }}" data-ajax class="space-y-5">
                 @csrf
                 <x-input name="email" label="Email address" type="email" required autocomplete="email" autofocus />
                 <x-input name="password" label="Password" type="password" required autocomplete="current-password" />

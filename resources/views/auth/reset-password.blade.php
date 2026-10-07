@@ -2,7 +2,11 @@
     <div class="mx-auto max-w-md py-6">
         <x-page-heading title="Choose a new password" description="Use at least 8 characters." />
         <x-card>
-            <form method="POST" action="{{ route('password.update') }}" class="space-y-5">
+            <form
+                method="POST"
+                action="{{ route('password.update') }}"
+                data-ajax
+                data-redirect="{{ route('login') }}" class="space-y-5">
                 @csrf
                 <input type="hidden" name="token" value="{{ $request->route('token') }}" />
                 <x-input

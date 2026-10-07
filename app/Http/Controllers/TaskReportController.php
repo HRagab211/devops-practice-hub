@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TaskReportResource;
 use App\Jobs\GenerateTaskReport;
 use App\Models\TaskReport;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +22,7 @@ class TaskReportController extends Controller
         return view('reports', ['reports' => $request->user()->reports()->latest('id')->paginate(10)]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): JsonResponse|RedirectResponse
     {
         $report = $request->user()->reports()->create(['status' => 'pending', 'disk' => config('hub.report_disk')]);
         try {
@@ -29,7 +31,18 @@ class TaskReportController extends Controller
             $report->update(['status' => 'failed']);
             Log::error('Report dispatch failed', ['report_id' => $report->id, 'exception' => $exception]);
 
+            if ($request->wantsJson()) {
+                return response()->json(['message' => 'Your report could not be queued. Please try again.'], 503);
+            }
+
             return to_route('reports.index')->with('error', 'Your report could not be queued. Please try again.');
+        }
+
+        if ($request->wantsJson()) {
+            return TaskReportResource::make($report)
+                ->additional(['message' => 'Report requested. Refresh this page to see its progress.'])
+                ->response()
+                ->setStatusCode(202);
         }
 
         return to_route('reports.index')->with('status', 'Report requested. Refresh this page to see its progress.');

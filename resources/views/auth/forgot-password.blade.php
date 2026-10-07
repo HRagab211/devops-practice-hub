@@ -5,7 +5,7 @@
             description="Enter your email address and we’ll send a reset link."
         />
         <x-card>
-            <form method="POST" action="{{ route('password.email') }}" class="space-y-5">
+            <form method="POST" action="{{ route('password.email') }}" data-ajax data-reset class="space-y-5">
                 @csrf
                 <x-input name="email" label="Email address" type="email" required autocomplete="email" autofocus />
                 <x-button class="w-full">Send reset link</x-button>

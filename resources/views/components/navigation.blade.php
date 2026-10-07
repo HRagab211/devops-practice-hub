@@ -20,7 +20,7 @@
                 @if (config('hub.lab_enabled'))
                     <a class="hover:text-brand text-slate-600" href="{{ route('lab') }}">Lab</a>
                 @endif
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" data-ajax data-redirect="{{ route('home') }}">
                     @csrf
                     <button class="hover:text-brand text-slate-500">Log out</button>
                 </form>

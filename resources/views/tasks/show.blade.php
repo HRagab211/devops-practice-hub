@@ -22,6 +22,7 @@
             class="mt-6"
             method="POST"
             action="{{ route('tasks.destroy',$task) }}"
+            data-ajax
             data-confirm="Delete this task? This cannot be undone."
         >
             @csrf

@@ -3,7 +3,13 @@
     <div class="grid items-start gap-6 lg:grid-cols-[3fr_2fr]">
         <x-card>
             <h2 class="mb-6 text-lg font-semibold">Personal details</h2>
-            <form class="space-y-6" method="POST" enctype="multipart/form-data" action="{{ route('profile.update') }}">
+            <form
+                class="space-y-6"
+                method="POST"
+                enctype="multipart/form-data"
+                action="{{ route('profile.update') }}"
+                data-ajax
+            >
                 @csrf
                 @method('PATCH')
                 <x-avatar :user="$user" />
@@ -38,7 +44,7 @@
         <x-card>
             <h2 class="mb-2 text-lg font-semibold">Change password</h2>
             <p class="mb-6 text-sm text-slate-500">Use at least 8 characters.</p>
-            <form class="space-y-5" method="POST" action="{{ route('profile.password') }}">
+            <form class="space-y-5" method="POST" action="{{ route('profile.password') }}" data-ajax data-reset>
                 @csrf
                 @method('PUT')
                 <x-input

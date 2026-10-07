@@ -18,6 +18,7 @@
         @if (session('error'))
             <x-alert type="error">{{ session('error') }}</x-alert>
         @endif
+        <div id="ajax-alerts" aria-live="polite"></div>
         <x-validation-errors />
         {{ $slot }}
     </main>

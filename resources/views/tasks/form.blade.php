@@ -8,6 +8,7 @@
             <form
                 class="space-y-6"
                 method="POST"
+                data-ajax
                 action="{{ $task->exists ? route('tasks.update',$task) : route('tasks.store') }}"
             >
                 @csrf

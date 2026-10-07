@@ -3,7 +3,7 @@
         title="Your task reports"
         description="A downloadable copy of your tasks, prepared in the background."
     >
-        <form method="POST" action="{{ route('reports.store') }}">
+        <form method="POST" action="{{ route('reports.store') }}" data-ajax>
             @csrf
             <x-button>Generate my task report</x-button>
         </form>

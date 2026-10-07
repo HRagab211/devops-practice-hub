@@ -5,7 +5,11 @@
             description="Create an account to keep track of your next steps."
         />
         <x-card>
-            <form method="POST" action="{{ route('register') }}" class="space-y-5">
+            <form
+                method="POST"
+                action="{{ route('register') }}"
+                data-ajax
+                data-redirect="{{ route('dashboard') }}" class="space-y-5">
                 @csrf
                 <x-input name="name" label="Name" required maxlength="255" autocomplete="name" autofocus />
                 <x-input name="email" label="Email address" type="email" required autocomplete="email" />
