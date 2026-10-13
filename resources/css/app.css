@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../views/**/*.blade.php';
+@source '../js/**/*.js';
 @theme {
 --font-sans: 'Segoe UI', ui-sans-serif, system-ui, sans-serif;
 --color-brand: #2458db;

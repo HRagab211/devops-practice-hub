@@ -62,12 +62,16 @@ test('ajax task changes reject another owner', function () {
     expect($task->fresh()->title)->toBe('Original');
 });
 
-test('ajax profile update returns a redirect back to the profile', function () {
+test('ajax profile update returns the updated profile', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->patchJson('/profile', ['name' => 'New Name', 'email' => $user->email]);
 
-    $response->assertOk()->assertJson(['message' => 'Profile updated.', 'redirect' => route('profile.edit')]);
+    $response->assertOk()
+        ->assertJsonPath('message', 'Profile updated.')
+        ->assertJsonPath('data.name', 'New Name')
+        ->assertJsonPath('data.avatar_url', null)
+        ->assertJsonMissingPath('redirect');
     expect($user->fresh()->name)->toBe('New Name');
 });
 

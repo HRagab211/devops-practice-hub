@@ -8,6 +8,7 @@ use App\Models\TaskReport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -17,9 +18,13 @@ use Throwable;
 
 class TaskReportController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): AnonymousResourceCollection|View
     {
-        return view('reports', ['reports' => $request->user()->reports()->latest('id')->paginate(10)]);
+        if (! $request->wantsJson()) {
+            return view('reports');
+        }
+
+        return TaskReportResource::collection($request->user()->reports()->latest('id')->paginate(10));
     }
 
     public function store(Request $request): JsonResponse|RedirectResponse

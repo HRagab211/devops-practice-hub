@@ -10,22 +10,26 @@ use App\Models\Task;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class TaskController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request): AnonymousResourceCollection|View
     {
         $status = in_array($request->query('status'), ['pending', 'in_progress', 'completed'], true) ? $request->query('status') : null;
 
-        return view('tasks.index', [
-            'tasks' => $request->user()->tasks()
+        if (! $request->wantsJson()) {
+            return view('tasks.index', ['status' => $status]);
+        }
+
+        return TaskResource::collection(
+            $request->user()->tasks()
                 ->when($status, fn ($query) => $query->where('status', $status))
                 ->latest('updated_at')->orderByDesc('id')
-                ->paginate(12)->withQueryString(),
-            'status' => $status,
-        ]);
+                ->paginate(12)->withQueryString()
+        );
     }
 
     public function create(): View
@@ -49,11 +53,11 @@ class TaskController extends Controller
         return to_route('tasks.show', $task)->with('status', 'Task created.');
     }
 
-    public function show(Task $task): View
+    public function show(Request $request, Task $task): TaskResource|View
     {
         Gate::authorize('view', $task);
 
-        return view('tasks.show', compact('task'));
+        return $request->wantsJson() ? TaskResource::make($task) : view('tasks.show', compact('task'));
     }
 
     public function edit(Task $task): View

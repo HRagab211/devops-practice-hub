@@ -99,13 +99,13 @@ test('task changes invalidate only the owners cached dashboard counts', function
     expect(Cache::get(DashboardCounts::key($other->id)))->toBe(['total' => 99]);
 });
 
-test('tasks are filtered paginated escaped and scoped to the owner', function () {
+test('tasks are filtered paginated and scoped to the owner', function () {
     $user = User::factory()->create();
     Task::factory()->for($user)->count(13)->create(['status' => 'completed']);
-    Task::factory()->for($user)->create(['title' => '<script>alert(1)</script>']);
+    Task::factory()->for($user)->create(['title' => '<script>alert(1)</script>', 'status' => 'pending']);
     Task::factory()->create(['title' => 'Private task']);
-    $this->actingAs($user)->get('/tasks?status=completed')->assertOk()->assertDontSee('Private task')->assertViewHas('tasks', fn ($tasks) => $tasks->total() === 13 && $tasks->count() === 12);
-    $this->get('/tasks?status=pending')->assertSee('&lt;script&gt;alert(1)&lt;/script&gt;', false)->assertDontSee('<script>alert(1)</script>', false);
+    $this->actingAs($user)->getJson('/tasks?status=completed')->assertOk()->assertJsonMissing(['title' => 'Private task'])->assertJsonCount(12, 'data')->assertJsonPath('meta.total', 13);
+    $this->getJson('/tasks?status=pending')->assertJsonCount(1, 'data')->assertJsonPath('data.0.title', '<script>alert(1)</script>');
 });
 
 test('invalid task input creates no records', function () {
@@ -195,13 +195,13 @@ test('failed jobs persist a safe terminal status', function () {
     $report = TaskReport::factory()->create();
     (new GenerateTaskReport($report->id))->failed(new RuntimeException('private error'));
     expect($report->fresh()->status)->toBe('failed');
-    $this->actingAs($report->user)->get('/reports')->assertSee('This report failed')->assertDontSee('private error');
+    $this->actingAs($report->user)->getJson('/reports')->assertJsonPath('data.0.status', 'failed')->assertDontSee('private error');
 });
 
 test('reports cannot be downloaded by another user or before completion', function () {
     $report = TaskReport::factory()->create();
     $this->actingAs(User::factory()->create())->get('/reports/'.$report->id.'/download')->assertNotFound();
-    $this->get('/reports')->assertDontSee('Task report #'.$report->id);
+    $this->getJson('/reports')->assertJsonCount(0, 'data');
     $this->actingAs($report->user)->get('/reports/'.$report->id.'/download')->assertNotFound();
 });
 
@@ -238,10 +238,13 @@ test('workspace pages render persisted information and lab respects its flag', f
     config(['hub.lab_enabled' => true]);
     $user = User::factory()->create();
     $task = Task::factory()->for($user)->create();
-    $this->actingAs($user)->get('/dashboard')->assertOk()->assertSee($task->title);
-    $this->get('/profile')->assertOk()->assertSee($user->email);
+    $this->actingAs($user)->get('/dashboard')->assertOk()->assertSee($user->name);
+    $this->getJson('/dashboard')->assertJsonPath('data.recent_tasks.0.title', $task->title);
+    $this->get('/profile')->assertOk();
+    $this->getJson('/profile')->assertJsonPath('data.email', $user->email);
     $this->get('/tasks/create')->assertOk();
-    $this->get('/tasks/'.$task->id)->assertOk()->assertSee($task->title);
+    $this->get('/tasks/'.$task->id)->assertOk();
+    $this->getJson('/tasks/'.$task->id)->assertJsonPath('data.title', $task->title);
     $this->get('/tasks/'.$task->id.'/edit')->assertOk();
     $this->get('/lab')->assertOk()->assertSee('No heartbeat recorded');
     config(['hub.lab_enabled' => false]);

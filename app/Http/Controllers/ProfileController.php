@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\UpdateProfile;
 use App\Http\Requests\PasswordRequest;
 use App\Http\Requests\ProfileRequest;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,9 +14,9 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-    public function edit(Request $request): View
+    public function edit(Request $request): UserResource|View
     {
-        return view('profile', ['user' => $request->user()]);
+        return $request->wantsJson() ? UserResource::make($request->user()) : view('profile');
     }
 
     public function update(ProfileRequest $request, UpdateProfile $update): JsonResponse|RedirectResponse
@@ -23,9 +24,7 @@ class ProfileController extends Controller
         $update->handle($request->user(), $request->safe()->only(['name', 'email', 'bio']), $request->file('avatar'), $request->boolean('remove_avatar'));
 
         if ($request->wantsJson()) {
-            session()->flash('status', 'Profile updated.');
-
-            return response()->json(['message' => 'Profile updated.', 'redirect' => route('profile.edit')]);
+            return UserResource::make($request->user()->fresh())->additional(['message' => 'Profile updated.'])->response();
         }
 
         return to_route('profile.edit')->with('status', 'Profile updated.');

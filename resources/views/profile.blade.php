@@ -9,22 +9,21 @@
                 enctype="multipart/form-data"
                 action="{{ route('profile.update') }}"
                 data-ajax
+                data-profile-form
+                data-fill-from="{{ route('profile.edit') }}"
             >
                 @csrf
                 @method('PATCH')
-                <x-avatar :user="$user" />
+                <div data-avatar class="size-14 rounded-full bg-slate-100"></div>
                 <x-input name="avatar" label="Profile picture" type="file" accept="image/jpeg,image/png,image/webp" />
                 <p class="text-xs text-slate-500">JPEG, PNG, or WebP. Maximum 2 MB.</p>
-                @if ($user->avatar_path)
-                    <label class="flex items-center gap-2 text-sm">
-                        <input type="checkbox" name="remove_avatar" value="1" />Remove current picture</label>
-                @endif
-                <x-input name="name" label="Name" :value="$user->name" required maxlength="255" autocomplete="name" />
+                <label class="flex items-center gap-2 text-sm" data-remove-avatar hidden>
+                    <input type="checkbox" name="remove_avatar" value="1" />Remove current picture</label>
+                <x-input name="name" label="Name" required maxlength="255" autocomplete="name" />
                 <x-input
                     name="email"
                     label="Email address"
                     type="email"
-                    :value="$user->email"
                     required
                     autocomplete="email"
                 />
@@ -36,7 +35,7 @@
                         rows="3"
                         maxlength="500"
                         class="w-full rounded-lg border border-slate-300 px-3 py-2.5"
-                    >{{ old('bio', $user->bio) }}</textarea>
+                    ></textarea>
                 </div>
                 <x-button>Save profile</x-button>
             </form>
