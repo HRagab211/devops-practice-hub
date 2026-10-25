@@ -11,8 +11,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Routing\Attributes\Controllers\Middleware;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
+
+#[Middleware('ensure-idempotency', only: ['store'])]
 
 class TaskController extends Controller
 {
@@ -26,7 +29,7 @@ class TaskController extends Controller
 
         return TaskResource::collection(
             $request->user()->tasks()
-                ->when($status, fn ($query) => $query->where('status', $status))
+                ->when($status, fn($query) => $query->where('status', $status))
                 ->latest('updated_at')->orderByDesc('id')
                 ->paginate(12)->withQueryString()
         );
